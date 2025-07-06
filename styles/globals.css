@@ -67,18 +67,18 @@ button:hover {
   transform: scale(1.02);
 }
 
-.message {
+.mensagem {
   font-size: 14px;
   margin-top: 16px;
   min-height: 20px;
   transition: opacity 0.3s ease-in-out;
 }
 
-.message.error {
+.mensagem.erro {
   color: #d93025;
 }
 
-.message.success {
+.mensagem.successo {
   color: #198754;
 }
 

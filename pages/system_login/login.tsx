@@ -2,49 +2,52 @@
 
 // Página responsável por fazer login do usuário no sistema
 
-import React, { useState } from 'react'; // Permite que o componente "lembre" de valores e se re-renderize quando esses valores mudam.
-import { useRouter } from 'next/router'; // Dá acesso ao objeto 'router', que permite navegar programaticamente entre as páginas (redirecionamentos).
+import React, { useState } from 'react'; 
+import { useRouter } from 'next/router'; 
 
 
-const LoginPage: React.FC = () => {// Define o componente funcional 'LoginPage'.
-  // Armazenamento dos dados e atualizações
+const LoginPage: React.FC = () => {
+
+  
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const [isError, setIsError] = useState(false);
-  const router = useRouter(); // Inicializa o hook useRouter para usar o objeto 'router'.
+  const [senha, setSenha] = useState('');
+  const [mensagem, setMensagem] = useState('');
+  const [erro, setErro] = useState(false);
+
+  const router = useRouter(); 
 
    // Esta função é chamada quando o formulário é submetido, ou seja, clicar no botão Entrar
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const entrar = async (evento: React.FormEvent<HTMLFormElement>) => {
+    evento.preventDefault();
 
     try {
       // Chamada para a API de Login
-      const res = await fetch('/api/login', {
+      const resposta = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, senha }),
       });
 
-      const data = await res.json(); // Analisa a resposta JSON recebida do servidor.
+      const dados = await resposta.json(); // Analisa a resposta JSON recebida do servidor.
 
-      if (!res.ok) {
-        setMessage(data.error || 'Erro ao tentar logar'); // Pega a mensagem de erro do servidor
-        setIsError(true);
+      if (!resposta.ok) {
+        setMensagem(dados.error || 'Erro ao tentar logar'); // Pega a mensagem de erro do servidor
+        setErro(true);
+
       } else {
-        // Salva dados no localStorage
-        localStorage.setItem('reference', email);
-        localStorage.setItem('bonus', String(data.bonus ?? 0));
-        localStorage.setItem('referencesCount', String(data.referencesCount ?? 0));
 
-        setMessage('Login realizado com sucesso!');
-        setIsError(false);
+        // Função para guardar os dados de login na memória do navegador
+        localStorage.setItem('numReferencias', JSON.stringify(dados.user.numReferencias)); // Armazena o numero de referências
+        localStorage.setItem('bonusRecebido', JSON.stringify(dados.user.bonus)); // Armazena o bonus recebido pelo usuário
+
+        setMensagem('Login realizado com sucesso!');
+        setErro(false);
 
         setTimeout(() => router.push('../system_login/account'), 1500);
       }
     } catch (error) {
-      setMessage('Erro ao conectar com o servidor.');
-      setIsError(true);
+      setMensagem('Erro ao conectar com o servidor.');
+      setErro(true);
     }
   };
 
@@ -52,7 +55,7 @@ const LoginPage: React.FC = () => {// Define o componente funcional 'LoginPage'.
     <div className="container">
       <div className="loginBox">
         <h2 className="title">Login</h2>
-        <form onSubmit={handleSubmit} id="loginForm">
+        <form onSubmit={entrar} id="loginForm">
           <div className="formGroup">
             <input
               type="email"
@@ -68,17 +71,17 @@ const LoginPage: React.FC = () => {// Define o componente funcional 'LoginPage'.
               type="password"
               placeholder="Senha"
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
               className="input"
             />
           </div>
           <button type="submit" className="button">Entrar</button>
 
-          {message && (
-            <div className={`message ${isError ? 'error' : 'success'}`}>
-              {message}
-            </div>
+          {mensagem && (
+          <div className={`mensagem ${erro ? 'erro' : 'successo'}`}>
+            {mensagem}
+          </div>
           )}
         </form>
         <p className="registerText">
